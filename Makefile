@@ -10,7 +10,7 @@ CXXFLAGS=$(CFLAGS)
 all	:guisan calculator
 
 guisan:
-	cd guisan&&mkdir lib&&make all&&cd ..
+	cd guisan&&make all&&cd ..
 
 calculator:src/calculator.o src/parser.o
 	$(CC) $(CXXFLAGS) -o calculator src/calculator.o src/parser.o $(LIBS)
