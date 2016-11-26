@@ -155,7 +155,7 @@ void init()
 	gui->setInput(input);
 	gui->setTop(top);
 	TTF_Init();
-	font = new gcn::SDLTrueTypeFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf",50);
+	font = new gcn::SDLTrueTypeFont("font/FreeSans.ttf",50);
 	gcn::Widget::setGlobalFont(font);
 
 	label = new gcn::Label("Science Calculator");

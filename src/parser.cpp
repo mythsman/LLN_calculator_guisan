@@ -1,6 +1,7 @@
 #include"parser.h"
-
-	namespace Parser{
+#include<sstream>
+#include<math.h>
+namespace Parser{
 	bool Parser::match(std::string cmp){
 		for(int i=0;i<cmp.length();i++){
 			if(pos+i>=expr.length()||expr[pos+i]!=cmp[i])

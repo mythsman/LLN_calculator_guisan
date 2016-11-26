@@ -1,9 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 #include<iostream>
-#include<sstream>
 #include<string>
-#include<math.h>
 namespace Parser{
 	const int SUCCESS=0;
 	const int FAILURE=1;
