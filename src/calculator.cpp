@@ -153,7 +153,7 @@ void init()
 	gui = new gcn::Gui();
 	gui->setGraphics(graphics);
 	gui->setInput(input);
-	gui->setTop(top);
+	gui->setTo    p(top);
 	TTF_Init();
 	font = new gcn::SDLTrueTypeFont("font/FreeSans.ttf",50);
 	gcn::Widget::setGlobalFont(font);
@@ -164,11 +164,11 @@ void init()
 	
 	textBox=new gcn::TextBox("");
 	textBox->setEditable(false);
-    textBoxScrollArea = new gcn::ScrollArea(textBox);
+	textBoxScrollArea = new gcn::ScrollArea(textBox);
 	textBoxScrollArea->setScrollPolicy(gcn::ScrollArea::SHOW_ALWAYS,gcn::ScrollArea::SHOW_NEVER);
-    textBoxScrollArea->setWidth(520);
-    textBoxScrollArea->setHeight(70);
-    textBoxScrollArea->setBorderSize(1);
+	textBoxScrollArea->setWidth(520);
+	textBoxScrollArea->setHeight(70);
+	textBoxScrollArea->setBorderSize(1);
 	top->add(textBoxScrollArea, 10,100 );	
 	
 	textBoxAns=new gcn::TextBox("");
