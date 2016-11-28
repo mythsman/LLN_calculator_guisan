@@ -153,7 +153,7 @@ void init()
 	gui = new gcn::Gui();
 	gui->setGraphics(graphics);
 	gui->setInput(input);
-	gui->setTo    p(top);
+	gui->setTop(top);
 	TTF_Init();
 	font = new gcn::SDLTrueTypeFont("font/FreeSans.ttf",50);
 	gcn::Widget::setGlobalFont(font);
