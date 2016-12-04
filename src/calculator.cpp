@@ -7,6 +7,9 @@
 
 bool running = true;
 
+const int WIDTH=405;
+const int HEIGHT=720;
+
 SDL_Window* window;
 SDL_Surface* screen;
 SDL_Event event;
@@ -18,10 +21,9 @@ gcn::SDLImageLoader* imageLoader;
 gcn::Gui* gui;
 gcn::Container* top;
 gcn::SDLTrueTypeFont* font;
-gcn::Label* label;
 gcn::TextBox* textBox;
 gcn::TextBox* textBoxAns;
-gcn::ScrollArea* textBoxScrollArea;
+gcn::ScrollArea *textBoxScrollArea,*textBoxAnsScrollArea;
 gcn::Button *buttonSin,
 			*buttonCos,
 			*buttonTan,
@@ -44,7 +46,7 @@ gcn::Button *buttonSin,
 			*buttonMinus,
 			*buttonEmpty;
 
-Parser::Parser parser;
+Parser parser;
 class ButtonListener : public gcn::ActionListener{
 public:
 	void action(const gcn::ActionEvent& actionEvent){
@@ -80,12 +82,12 @@ public:
 		}else if(actionEvent.getSource()==buttonEq){
 			end=true;
 			std::string preCalculated=parser.calculate(textBox->getText());
-		if(parser.getStatus()==Parser::SUCCESS){
-		    textBoxAns->setText(preCalculated);
-		    textBoxAns->setWidth(520);
+		if(preCalculated!="Error"){
+		    textBoxAns->setText("="+preCalculated);
+		    textBoxAns->setWidth(WIDTH);
 		}else{
-		    textBoxAns->setText("Error!");
-		    textBoxAns->setWidth(520);
+		    textBoxAns->setText(preCalculated);
+		    textBoxAns->setWidth(WIDTH);
 		}
 		textBox->setCaretColumn(0xffffff);
 		textBox->scrollToCaret();
@@ -123,12 +125,12 @@ public:
 		if(end)
 			return ;
 		std::string preCalculated=parser.calculate(textBox->getText());
-		if(parser.getStatus()==Parser::SUCCESS){
-			textBoxAns->setText(preCalculated);
-			textBoxAns->setWidth(520);
+		if(preCalculated!="Error"){
+			textBoxAns->setText("="+preCalculated);
+			textBoxAns->setWidth(WIDTH);
 		}else{
-			textBoxAns->setText("");
-			textBoxAns->setWidth(520);
+			textBoxAns->setText("=");
+			textBoxAns->setWidth(WIDTH);
 		}
 		textBox->setCaretColumn(0xffffff);
 		textBox->scrollToCaret();
@@ -138,7 +140,7 @@ void init()
 {
 	SDL_Init(SDL_INIT_VIDEO);
 	window = SDL_CreateWindow("Science Calculator",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 540, 720,
+		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT,
 		0);
 
 	screen = SDL_GetWindowSurface(window);
@@ -149,225 +151,252 @@ void init()
 	input = new gcn::SDLInput();
 
 	top = new gcn::Container();
-	top->setDimension(gcn::Rectangle(0, 0, 540, 720));
+	top->setDimension(gcn::Rectangle(0, 0, WIDTH, HEIGHT));
 	gui = new gcn::Gui();
 	gui->setGraphics(graphics);
 	gui->setInput(input);
 	gui->setTop(top);
 	TTF_Init();
-	font = new gcn::SDLTrueTypeFont("font/FreeSans.ttf",50);
-	gcn::Widget::setGlobalFont(font);
+	font = new gcn::SDLTrueTypeFont("font/FreeSans.ttf",40);
 
-	label = new gcn::Label("Science Calculator");
-	label->setPosition(80, 20);
-	top->add(label);
-	
+	gcn::Widget::setGlobalFont(font);
+	gcn::Color white(255,255,255);
+	gcn::Color red(255,99,71);
+	gcn::Color yellow(255,255,0);
+	gcn::Color blue(0,205,205);
+	gcn::Color orange(255,165,79);
+	top->setBaseColor(white);
+
 	textBox=new gcn::TextBox("");
 	textBox->setEditable(false);
 	textBoxScrollArea = new gcn::ScrollArea(textBox);
-	textBoxScrollArea->setScrollPolicy(gcn::ScrollArea::SHOW_ALWAYS,gcn::ScrollArea::SHOW_NEVER);
-	textBoxScrollArea->setWidth(520);
-	textBoxScrollArea->setHeight(70);
-	textBoxScrollArea->setBorderSize(1);
-	top->add(textBoxScrollArea, 10,100 );	
+	textBoxScrollArea->setWidth(WIDTH);
+	textBoxScrollArea->setHeight((HEIGHT-WIDTH*6/5)/3);
+	textBoxScrollArea->setBaseColor(white);
+	top->add(textBoxScrollArea,0,(HEIGHT-WIDTH*6/5)/9);	
 	
-	textBoxAns=new gcn::TextBox("");
-	textBoxAns->setWidth(520);
+	textBoxAns=new gcn::TextBox("=");
 	textBoxAns->setEditable(false);
-	top->add(textBoxAns,10,200);
+	textBoxAnsScrollArea=new gcn::ScrollArea(textBoxAns);
+	textBoxAnsScrollArea->setWidth(WIDTH);
+	textBoxAnsScrollArea->setHeight((HEIGHT-WIDTH*6/5)/3);
+	top->add(textBoxAnsScrollArea,0,(HEIGHT-WIDTH*6/5)*5/9);
 
 	buttonListener=new ButtonListener();
 	buttonEmpty=new gcn::Button("");
-	buttonEmpty->setWidth(96);
-	buttonEmpty->setHeight(60);
+	buttonEmpty->setWidth(WIDTH/5);
+	buttonEmpty->setHeight(WIDTH/5);
+	buttonEmpty->setBaseColor(blue);
 	buttonEmpty->addActionListener(buttonListener);
-	top->add(buttonEmpty,10,290);
+	top->add(buttonEmpty,0,HEIGHT-WIDTH*6/5);
 	
 	buttonSqrt=new gcn::Button("sqrt");
-	buttonSqrt->setWidth(96);
-	buttonSqrt->setHeight(60);
+	buttonSqrt->setWidth(WIDTH/5);
+	buttonSqrt->setHeight(WIDTH/5);
+	buttonSqrt->setBaseColor(blue);
 	buttonSqrt->addActionListener(buttonListener);
-	top->add(buttonSqrt,116,290);
+	top->add(buttonSqrt,WIDTH/5,HEIGHT-WIDTH*6/5);
 	
 	buttonPow=new gcn::Button("^");
-	buttonPow->setWidth(96);
-	buttonPow->setHeight(60);
+	buttonPow->setWidth(WIDTH/5);
+	buttonPow->setHeight(WIDTH/5);
+	buttonPow->setBaseColor(blue);
 	buttonPow->addActionListener(buttonListener);
-	top->add(buttonPow,222,290);
+	top->add(buttonPow,WIDTH*2/5,HEIGHT-WIDTH*6/5);
 	
 	buttonPi=new gcn::Button("pi");
-	buttonPi->setWidth(96);
-	buttonPi->setHeight(60);
+	buttonPi->setWidth(WIDTH/5);
+	buttonPi->setHeight(WIDTH/5);
+	buttonPi->setBaseColor(blue);
 	buttonPi->addActionListener(buttonListener);
-	top->add(buttonPi,328,290);
+	top->add(buttonPi,WIDTH*3/5,HEIGHT-WIDTH*6/5);
 	
 	buttonCls=new gcn::Button("cls");
-	buttonCls->setWidth(96);
-	buttonCls->setHeight(60);
+	buttonCls->setWidth(WIDTH/5);
+	buttonCls->setHeight(WIDTH/5);
+	buttonCls->setBaseColor(yellow);
 	buttonCls->addActionListener(buttonListener);
-	top->add(buttonCls,434,290);
+	top->add(buttonCls,WIDTH*4/5,HEIGHT-WIDTH*6/5);
 	
 	buttonSin=new gcn::Button("sin");
-	buttonSin->setWidth(96);
-	buttonSin->setHeight(60);
+	buttonSin->setWidth(WIDTH/5);
+	buttonSin->setHeight(WIDTH/5);
+	buttonSin->setBaseColor(blue);
 	buttonSin->addActionListener(buttonListener);
-	top->add(buttonSin,10,360);
+	top->add(buttonSin,0,HEIGHT-WIDTH*5/5);
 
 	buttonL=new gcn::Button("(");
-	buttonL->setWidth(96);
-	buttonL->setHeight(60);
+	buttonL->setWidth(WIDTH/5);
+	buttonL->setHeight(WIDTH/5);
+	buttonL->setBaseColor(blue);
 	buttonL->addActionListener(buttonListener);
-	top->add(buttonL,116,360);
+	top->add(buttonL,WIDTH/5,HEIGHT-WIDTH*5/5);
 
 	buttonR=new gcn::Button(")");
-	buttonR->setWidth(96);
-	buttonR->setHeight(60);
+	buttonR->setWidth(WIDTH/5);
+	buttonR->setHeight(WIDTH/5);
+	buttonR->setBaseColor(blue);
 	buttonR->addActionListener(buttonListener);
-	top->add(buttonR,222,360);
+	top->add(buttonR,WIDTH*2/5,HEIGHT-WIDTH*5/5);
 
 	buttonE=new gcn::Button("e");
-	buttonE->setWidth(96);
-	buttonE->setHeight(60);
+	buttonE->setWidth(WIDTH/5);
+	buttonE->setHeight(WIDTH/5);
+	buttonE->setBaseColor(blue);
 	buttonE->addActionListener(buttonListener);
-	top->add(buttonE,328,360);
+	top->add(buttonE,WIDTH*3/5,HEIGHT-WIDTH*5/5);
 
 	buttonDel=new gcn::Button("del");
-	buttonDel->setWidth(96);
-	buttonDel->setHeight(60);
+	buttonDel->setWidth(WIDTH/5);
+	buttonDel->setHeight(WIDTH/5);
+	buttonDel->setBaseColor(yellow);
 	buttonDel->addActionListener(buttonListener);
-	top->add(buttonDel,434,360);
+	top->add(buttonDel,WIDTH*4/5,HEIGHT-WIDTH*5/5);
 
 	buttonCos=new gcn::Button("cos");
-	buttonCos->setWidth(96);
-	buttonCos->setHeight(60);
+	buttonCos->setWidth(WIDTH/5);
+	buttonCos->setHeight(WIDTH/5);
+	buttonCos->setBaseColor(blue);
 	buttonCos->addActionListener(buttonListener);
-	top->add(buttonCos,10,430);
+	top->add(buttonCos,0,HEIGHT-WIDTH*4/5);
 
 	button[7]=new gcn::Button("7");
-	button[7]->setWidth(96);
-	button[7]->setHeight(60);
+	button[7]->setWidth(WIDTH/5);
+	button[7]->setHeight(WIDTH/5);
+	button[7]->setBaseColor(white);
 	button[7]->addActionListener(buttonListener);
-	top->add(button[7],116,430);
+	top->add(button[7],WIDTH/5,HEIGHT-WIDTH*4/5);
 
 	button[8]=new gcn::Button("8");
-	button[8]->setWidth(96);
-	button[8]->setHeight(60);
+	button[8]->setWidth(WIDTH/5);
+	button[8]->setHeight(WIDTH/5);
+	button[8]->setBaseColor(white);
 	button[8]->addActionListener(buttonListener);
-	top->add(button[8],222,430);
+	top->add(button[8],WIDTH*2/5,HEIGHT-WIDTH*4/5);
 
 	button[9]=new gcn::Button("9");
-	button[9]->setWidth(96);
-	button[9]->setHeight(60);
+	button[9]->setWidth(WIDTH/5);
+	button[9]->setHeight(WIDTH/5);
+	button[9]->setBaseColor(white);
 	button[9]->addActionListener(buttonListener);
-	top->add(button[9],328,430);
+	top->add(button[9],WIDTH*3/5,HEIGHT-WIDTH*4/5);
 
 	buttonDiv=new gcn::Button("/");
-	buttonDiv->setWidth(96);
-	buttonDiv->setHeight(60);
+	buttonDiv->setWidth(WIDTH/5);
+	buttonDiv->setHeight(WIDTH/5);
+	buttonDiv->setBaseColor(red);
 	buttonDiv->addActionListener(buttonListener);
-	top->add(buttonDiv,434,430);
+	top->add(buttonDiv,WIDTH*4/5,HEIGHT-WIDTH*4/5);
 
 	buttonTan=new gcn::Button("tan");
-	buttonTan->setWidth(96);
-	buttonTan->setHeight(60);
+	buttonTan->setWidth(WIDTH/5);
+	buttonTan->setHeight(WIDTH/5);
+	buttonTan->setBaseColor(blue);
 	buttonTan->addActionListener(buttonListener);
-	top->add(buttonTan,10,500);
+	top->add(buttonTan,0,HEIGHT-WIDTH*3/5);
 
 	button[4]=new gcn::Button("4");
-	button[4]->setWidth(96);
-	button[4]->setHeight(60);
+	button[4]->setWidth(WIDTH/5);
+	button[4]->setHeight(WIDTH/5);
+	button[4]->setBaseColor(white);
 	button[4]->addActionListener(buttonListener);
-	top->add(button[4],116,500);
+	top->add(button[4],WIDTH/5,HEIGHT-WIDTH*3/5);
 
 	button[5]=new gcn::Button("5");
-	button[5]->setWidth(96);
-	button[5]->setHeight(60);
+	button[5]->setWidth(WIDTH/5);
+	button[5]->setHeight(WIDTH/5);
+	button[5]->setBaseColor(white);
 	button[5]->addActionListener(buttonListener);
-	top->add(button[5],222,500);
+	top->add(button[5],WIDTH*2/5,HEIGHT-WIDTH*3/5);
 
 	button[6]=new gcn::Button("6");
-	button[6]->setWidth(96);
-	button[6]->setHeight(60);
+	button[6]->setWidth(WIDTH/5);
+	button[6]->setHeight(WIDTH/5);
+	button[6]->setBaseColor(white);
 	button[6]->addActionListener(buttonListener);
-	top->add(button[6],328,500);
+	top->add(button[6],WIDTH*3/5,HEIGHT-WIDTH*3/5);
 
 	buttonMul=new gcn::Button("*");
-	buttonMul->setWidth(96);
-	buttonMul->setHeight(60);
+	buttonMul->setWidth(WIDTH/5);
+	buttonMul->setHeight(WIDTH/5);
+	buttonMul->setBaseColor(red);
 	buttonMul->addActionListener(buttonListener);
-	top->add(buttonMul,434,500);
+	top->add(buttonMul,WIDTH*4/5,HEIGHT-WIDTH*3/5);
 
 	buttonLn=new gcn::Button("ln");
-	buttonLn->setWidth(96);
-	buttonLn->setHeight(60);
+	buttonLn->setWidth(WIDTH/5);
+	buttonLn->setHeight(WIDTH/5);
+	buttonLn->setBaseColor(blue);
 	buttonLn->addActionListener(buttonListener);
-	top->add(buttonLn,10,570);
+	top->add(buttonLn,0,HEIGHT-WIDTH*2/5);
 
 	button[1]=new gcn::Button("1");
-	button[1]->setWidth(96);
-	button[1]->setHeight(60);
+	button[1]->setWidth(WIDTH/5);
+	button[1]->setHeight(WIDTH/5);
+	button[1]->setBaseColor(white);
 	button[1]->addActionListener(buttonListener);
-	top->add(button[1],116,570);
+	top->add(button[1],WIDTH/5,HEIGHT-WIDTH*2/5);
 
 	button[2]=new gcn::Button("2");
-	button[2]->setWidth(96);
-	button[2]->setHeight(60);
+	button[2]->setWidth(WIDTH/5);
+	button[2]->setHeight(WIDTH/5);
+	button[2]->setBaseColor(white);
 	button[2]->addActionListener(buttonListener);
-	top->add(button[2],222,570);
+	top->add(button[2],WIDTH*2/5,HEIGHT-WIDTH*2/5);
 
 	button[3]=new gcn::Button("3");
-	button[3]->setWidth(96);
-	button[3]->setHeight(60);
+	button[3]->setWidth(WIDTH/5);
+	button[3]->setHeight(WIDTH/5);
+	button[3]->setBaseColor(white);
 	button[3]->addActionListener(buttonListener);
-	top->add(button[3],328,570);
+	top->add(button[3],WIDTH*3/5,HEIGHT-WIDTH*2/5);
 
 	buttonMinus=new gcn::Button("-");
-	buttonMinus->setWidth(96);
-	buttonMinus->setHeight(60);
+	buttonMinus->setWidth(WIDTH/5);
+	buttonMinus->setHeight(WIDTH/5);
+	buttonMinus->setBaseColor(red);
 	buttonMinus->addActionListener(buttonListener);
-	top->add(buttonMinus,434,570);
+	top->add(buttonMinus,WIDTH*4/5,HEIGHT-WIDTH*2/5);
 
 	buttonLg=new gcn::Button("lg");
-	buttonLg->setWidth(96);
-	buttonLg->setHeight(60);
+	buttonLg->setWidth(WIDTH/5);
+	buttonLg->setHeight(WIDTH/5);
+	buttonLg->setBaseColor(blue);
 	buttonLg->addActionListener(buttonListener);
-	top->add(buttonLg,10,640);
-
-	buttonLg=new gcn::Button("lg");
-	buttonLg->setWidth(96);
-	buttonLg->setHeight(60);
-	buttonLg->addActionListener(buttonListener);
-	top->add(buttonLg,10,640);
+	top->add(buttonLg,0,HEIGHT-WIDTH/5);
 
 	button[0]=new gcn::Button("0");
-	button[0]->setWidth(96);
-	button[0]->setHeight(60);
+	button[0]->setWidth(WIDTH/5);
+	button[0]->setHeight(WIDTH/5);
+	button[0]->setBaseColor(white);
 	button[0]->addActionListener(buttonListener);
-	top->add(button[0],116,640);
+	top->add(button[0],WIDTH/5,HEIGHT-WIDTH/5);
 
 	buttonDot=new gcn::Button(".");
-	buttonDot->setWidth(96);
-	buttonDot->setHeight(60);
+	buttonDot->setWidth(WIDTH/5);
+	buttonDot->setHeight(WIDTH/5);
+	buttonDot->setBaseColor(white);
 	buttonDot->addActionListener(buttonListener);
-	top->add(buttonDot,222,640);
+	top->add(buttonDot,WIDTH*2/5,HEIGHT-WIDTH/5);
 
 	buttonEq=new gcn::Button("=");
-	buttonEq->setWidth(96);
-	buttonEq->setHeight(60);
+	buttonEq->setWidth(WIDTH/5);
+	buttonEq->setHeight(WIDTH/5);
+	buttonEq->setBaseColor(orange);
 	buttonEq->addActionListener(buttonListener);
-	top->add(buttonEq,328,640);
+	top->add(buttonEq,WIDTH*3/5,HEIGHT-WIDTH/5);
 
 	buttonPlus=new gcn::Button("+");
-	buttonPlus->setWidth(96);
-	buttonPlus->setHeight(60);
+	buttonPlus->setWidth(WIDTH/5);
+	buttonPlus->setHeight(WIDTH/5);
+	buttonPlus->setBaseColor(red);
 	buttonPlus->addActionListener(buttonListener);
-	top->add(buttonPlus,434,640);
+	top->add(buttonPlus,WIDTH*4/5,HEIGHT-WIDTH/5);
 
 }
 
 void halt()
 {
-	delete label;
 	delete font;
 	delete top;
 	delete gui;
@@ -375,6 +404,33 @@ void halt()
 	delete input;
 	delete graphics;
 	delete imageLoader;
+
+	delete textBox;
+	delete textBoxAns;
+	delete textBoxScrollArea,textBoxAnsScrollArea;
+	delete buttonSin,
+           buttonCos,
+           buttonTan,
+           buttonLn,
+           buttonLg,
+           buttonPow,
+           buttonSqrt,
+           buttonPi,
+           buttonE,
+           buttonCls,
+           buttonL,
+           buttonR,
+           buttonDel,
+           button[10],
+           buttonDot,
+           buttonEq,
+           buttonDiv,
+           buttonMul,
+           buttonPlus,
+           buttonMinus,
+           buttonEmpty;
+
+
 
 	SDL_DestroyWindow(window);
 	SDL_Quit();

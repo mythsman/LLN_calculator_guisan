@@ -14,8 +14,8 @@ A simple calculator with guisan and LL grammar.
 
 Raw Grammar:
 
-	E-->E+T|E-T|void
-	T-->N*T|N/T|void
+	E-->E+T|E-T|T
+	T-->N*T|N/T|N
 	N-->M^N|M
 	M-->(E)
 	   |sin(E)
