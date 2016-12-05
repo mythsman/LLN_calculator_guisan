@@ -100,7 +100,6 @@ public:
 		}else if(actionEvent.getSource()==buttonMinus){
 			textBox->setText(textBox->getText()+"-");
 		}else if(actionEvent.getSource()==buttonEmpty){
-			//do nothing
 		}else if(actionEvent.getSource()==button[0]){
 			textBox->setText(textBox->getText()+"0");
 		}else if(actionEvent.getSource()==button[1]){
